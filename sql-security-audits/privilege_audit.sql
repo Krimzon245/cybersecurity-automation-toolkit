@@ -1,27 +1,30 @@
 -- ====================================================================
--- CYBERSECURITY AUDIT: Identity & Access Management (IAM) Evaluation
--- Objective: Identify over-privileged accounts and verify least privilege compliance.
+-- AUDIT 1: Identity & Access Management (IAM) Violation Detection
+-- Objective: Enforce Least Privilege & detect high-risk stale accounts.
 -- ====================================================================
 
--- 1. IDENTIFY DIRECT ACCOUNTS WITH ADMINISTRATIVE PRIVILEGES
--- Checks for users assigned to high-risk roles that bypass standard employee structures.
-SELECT user_id, username, department, role, access_level 
-FROM user_registry
-WHERE access_level = 'Administrator' 
-  AND department != 'IT_Security';
+-- Query A: Flag non-IT personnel with root/admin-level access controls
+SELECT 
+    e.employee_id, 
+    e.username, 
+    e.department, 
+    a.access_level, 
+    a.last_modified_by
+FROM employee_registry AS e
+INNER JOIN access_privileges AS a 
+    ON e.employee_id = a.employee_id
+WHERE a.access_level IN ('Root', 'Administrator', 'DB_Owner')
+  AND e.department NOT IN ('IT_Security', 'Network_Engineering');
 
 
--- 2. DETECT STALE ACCOUNTS WITH ACTIVE NETWORK ACCESS
--- Flags active profiles that haven't authenticated in over 90 days (high risk for credential stuffing).
-SELECT user_id, username, email, last_login_date, account_status
-FROM user_registry
-WHERE account_status = 'Active' 
-  AND last_login_date < DATE_SUB(CURDATE(), INTERVAL 90 DAY);
-
-
--- 3. AUDIT ACCESS TO SENSITIVE FINANCIAL DATA TABLES
--- Pinpoints unauthorized internal telemetry views on restricted network assets.
-SELECT employee_id, transaction_id, access_timestamp, ip_address 
-FROM data_access_logs
-WHERE database_table = 'payroll_records'
-  AND department_authorized = 'FALSE';
+-- Query B: Hunt for inactive active accounts (Prime targets for credential stuffing)
+SELECT 
+    employee_id, 
+    username, 
+    email, 
+    last_login_timestamp, 
+    account_status
+FROM user_credentials
+WHERE account_status = 'Active'
+  AND last_login_timestamp < DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+ORDER BY last_login_timestamp ASC;
