@@ -15,7 +15,11 @@ Located in the `/python-defensive-scripts/` directory:
 * **`network_scanner.py` (Network Auditing & Banner Grabber):** Implements `socket` network socket streaming to audit targets for open TCP network vectors (SSH, FTP, HTTP) and captures service signatures to flag unauthorized software deployments.
 * **`file_integrity_checker.py` (Cryptographic Hash Surveillance):** Generates and registers system-level cryptographic baseline mappings utilizing the SHA-256 standard. Performs runtime comparison evaluations to instantly pinpoint digital tampering or malware actions.
 
-### 2. SQL: Enterprise IAM & Privilege Auditing
+### 2. SQL: Enterprise IAM & Security Forensics
 Located in the `/sql-security-audits/` directory:
 
-* **`privilege_audit.sql`:** Focuses on Identity & Access Management (IAM) compliance. These queries are engineered to map organizational asset databases to uncover over-privileged administrative accounts, pinpoint stale credentials vulnerable to credential stuffing, and flag lateral access violations on restricted tables.
+* **`privilege_audit.sql`:** A robust database auditing suite engineered to process large relational database logs for infrastructure protection:
+    * **IAM & Identity Controls:** Uncovers privilege creep by isolating unauthorized admin access and stale accounts.
+    * **Incident Triage:** Uses log aggregation algorithms (`COUNT`, `GROUP BY`, `HAVING`) to analyze brute-force attack trends.
+    * **Data Loss Prevention (DLP):** Monitors unauthorized data access on tables containing PII or Financial data outside regular business hours.
+    * **Vulnerability Analysis:** Audits operating system lifecycles to target and patch non-compliant network endpoints.
